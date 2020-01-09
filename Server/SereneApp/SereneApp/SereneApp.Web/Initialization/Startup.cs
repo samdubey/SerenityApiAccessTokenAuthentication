@@ -19,6 +19,8 @@ using Serenity.Web.Middleware;
 using System.Data.SqlClient;
 using System.IO;
 using System;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace SereneApp
 {
@@ -62,7 +64,18 @@ namespace SereneApp
                 o.AccessDeniedPath = new PathString("/Account/AccessDenied");
                 o.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                 o.SlidingExpiration = true;
-            });
+            }).AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+
+                cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidIssuer = "https://localhost:44310",
+                    ValidAudience = "https://localhost:44310",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("kDDlhs8pVhNIqVUCxdAOX0D"))
+                };
+            }); ;
 
             services.AddLogging(loggingBuilder =>
             {
